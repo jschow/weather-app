@@ -4,7 +4,6 @@ import WeatherCard from "./components/WeatherCard";
 
 const API_KEY = import.meta.env.VITE_OPENWEATHER_KEY;
 
-// Capitalize first letter of description
 function capitalizeFirst(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -12,6 +11,7 @@ function capitalizeFirst(str) {
 export default function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
+  const [unit, setUnit] = useState("metric");
 
   useEffect(() => {
     const saved = localStorage.getItem("weather");
@@ -20,19 +20,19 @@ export default function App() {
     }
   }, []);
 
-  async function handleSearch() {
-    if (city.trim() === "") return;
+  async function fetchWeather(cityName, units = unit) {
+    if (!cityName) return;
 
     try {
       const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=${units}`
       );
       const data = await res.json();
 
       if (data.cod === 200) {
         const weatherData = {
           city: data.name,
-          temp: Math.round(data.main.temp) + "°C",
+          temp: Math.round(data.main.temp) + (units === "metric" ? "°C" : "°F"),
           desc: capitalizeFirst(data.weather[0].description),
           icon: data.weather[0].icon,
         };
@@ -49,16 +49,32 @@ export default function App() {
     }
   }
 
+  function handleSearch() {
+    if (city.trim() === "") return;
+    fetchWeather(city, unit);
+    setCity(""); // ✅ clear the input after searching
+  }
+
+  function toggleUnit() {
+    setUnit((prev) => (prev === "metric" ? "imperial" : "metric"));
+  }
+
+  // ✅ Whenever unit changes, refetch for the current weather.city
+  useEffect(() => {
+    if (weather) {
+      fetchWeather(weather.city, unit);
+    }
+  }, [unit]);
+
   return (
     <div className="app">
       <h1>Weather App</h1>
 
-      {/* ✅ Wrap input & button in a form */}
       <form
         className="search-bar"
         onSubmit={(e) => {
-          e.preventDefault(); // prevent page reload
-          handleSearch(setCity(""));
+          e.preventDefault();
+          handleSearch();
         }}
       >
         <input
@@ -77,6 +93,8 @@ export default function App() {
             temp={weather.temp}
             desc={weather.desc}
             icon={weather.icon}
+            unit={unit}
+            onToggleUnit={toggleUnit}
           />
         )}
       </div>

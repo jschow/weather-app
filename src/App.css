@@ -13,12 +13,12 @@ html, body, #root {
     font-family: Arial, sans-serif;
     min-height: 100vh;          /* <-- full viewport height */
     text-align: center;
-    background-color: #fefbf5;
+    background-color: #eef5f2;
 }
 
 h1 {
     font-family: 'Poppins', sans-serif;
-    font-size: 36px;
+    font-size: 46px;
     margin-bottom: 20px;
     color: #333;
 }
@@ -51,17 +51,42 @@ button:hover {
 }
 
 .weather-card {
-  margin-top: 20px;
-  padding: 20px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  min-width: 200px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* ✅ allows absolute child positioning */
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-width: 200px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .weather-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+    /* transform: translateY(-5px) scale(1.02); */
+    transform: scale(1.05); /* zoom evenly from the center */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.unit-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #f0f0f0;       /* neutral grey background */
+    color: #333;               /* darker grey text */
+    border: none;
+    border-radius: 50%;        /* ensures circle */
+    width: 32px;               /* equal width and height */
+    height: 32px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;             /* centers text */
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.unit-toggle:hover {
+    background: #d9d9d9;       /* slightly darker on hover */
 }

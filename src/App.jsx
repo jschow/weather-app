@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import WeatherCard from "./components/WeatherCard";
 
+const API_KEY = import.meta.env.VITE_OPENWEATHER_KEY;
+
 export default function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
 
-  // Load saved weather from localStorage when app starts
   useEffect(() => {
     const saved = localStorage.getItem("weather");
     if (saved) {
@@ -18,20 +19,25 @@ export default function App() {
     if (city.trim() === "") return;
 
     try {
-      const res = await fetch(`https://wttr.in/${city}?format=j1`);
+      const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+      );
       const data = await res.json();
 
-      const current = data.current_condition[0];
-      const weatherData = {
-        city,
-        temp: current.temp_C + "°C",
-        desc: current.weatherDesc[0].value,
-      };
+      if (data.cod === 200) {
+        const weatherData = {
+          city: data.name,
+          temp: Math.round(data.main.temp) + "°C",
+          desc: data.weather[0].description,
+          icon: data.weather[0].icon, // like "04d"
+        };
 
-      setWeather(weatherData);
-
-      // Save to localStorage so it persists across refresh
-      localStorage.setItem("weather", JSON.stringify(weatherData));
+        setWeather(weatherData);
+        localStorage.setItem("weather", JSON.stringify(weatherData));
+      } else {
+        alert("City not found");
+        setWeather(null);
+      }
     } catch (err) {
       console.error("Error fetching weather:", err);
       setWeather(null);
@@ -57,6 +63,7 @@ export default function App() {
             city={weather.city}
             temp={weather.temp}
             desc={weather.desc}
+            icon={weather.icon}
           />
         )}
       </div>
